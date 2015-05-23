@@ -25,10 +25,12 @@ class Scene:
 
     def add(self,item): self.items.append(item)
 
-    def add_figure(self, figure):
-        for element in figure.structure:
-            self.cart_mapper(element)
-            self.items.append(element)
+    def add_pline(self, figure):
+
+        for p in figure.structure.points:
+            self.cart_mapper(p)
+
+        self.items.append(figure.structure)
 
     def strarray(self):
         var = ["<?xml version=\"1.0\"?>\n",
@@ -53,22 +55,36 @@ class Scene:
         os.system("%s %s" % (prog,self.svgname))
         return
 
+    def cart_mapper(self,point):
+        point[0] = self.width/2 + point[0]*self.width/2
+        point[1] = self.height/2 - point[1] * self.height/2
 
-    def cart_mapper(self,element):
-        element.start[0] = self.width/2 + element.start[0]*self.width/2
-        #element.start[0] = (element.start[0] - 1) * self.width/2
-        element.start[1] = self.height/2 - element.start[1] * self.height/2
-        #element.start[1] = (element.start[1] - 1) * self.height/2
 
-        element.end[0] = self.width/2 + element.end[0]*self.width/2
-        #element.end[0] = (element.end[0] - 1) * self.width/2
-        element.end[1] = self.height/2 - element.end[1] * self.height/2
-        #element.end[1] = (element.end[1] - 1) * self.height/2
 
+class PLine:
+    """
+    Write a polygon line in svg format
+    """
+    def __init__(self):
+        self.points = []
+        return
+
+    def add(self, p):
+        self.points.append(p)
+
+    def strarray(self):
+        svgp = "  <polyline points=\""
+
+        for p in self.points:
+            svgp += "   " + str(p[0]) + "," + str(p[1]) + "\n"
+
+        svgp += "   \" style=\"fill:none;stroke:black;stroke-width:3\" />"
+
+        return svgp
 
 class Line:
     """
-    Write a line in svg format
+    Define a line
     """
     def __init__(self,start,end):
         self.start = start #xy list
@@ -86,10 +102,6 @@ class Line:
     def ly(self):
         return self.end[1]-self.start[1]
 
-    def strarray(self):
-        return ["  <line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" />\n" %\
-                (self.start[0],self.start[1],self.end[0],self.end[1])]
-
 
 
 def gamma(line):
@@ -101,40 +113,56 @@ def gamma(line):
     piece = l / 4
 
     #First piece _
-    kblock.append(Line(  [line.start[0] , line.start[1]]  ,  [line.start[0]+line.lx()/3 , (line.start[1]+line.ly()/3)]  ))
+    kblock.append( [line.start[0] , line.start[1]] )
+    kblock.append( [line.start[0]+line.lx()/3 , (line.start[1]+line.ly()/3)])
 
     #Second piece /
     point2x = line.start[0]+line.lx()*2/3
     point2y = line.start[1]+line.ly()*2/3
-    newX = kblock[0].end[0] + (point2x-kblock[0].end[0])*0.5 - (point2y-kblock[0].end[1])*(np.sqrt(3)/2);
-    newY = kblock[0].end[1] + (point2x-kblock[0].end[0])*(np.sqrt(3)/2) + (point2y-kblock[0].end[1])*0.5;
+    newX = kblock[1][0] + (point2x-kblock[1][0])*0.5 - (point2y-kblock[1][1])*(np.sqrt(3)/2);
+    newY = kblock[1][1] + (point2x-kblock[1][0])*(np.sqrt(3)/2) + (point2y-kblock[1][1])*0.5;
 
-    kblock.append(Line(  [kblock[0].end[0] , kblock[0].end[1]]  ,  [newX , newY]  ))
+    kblock.append([newX , newY])
 
     #Third piece \
-    kblock.append(Line(  [kblock[1].end[0] , kblock[1].end[1]]  ,  [line.start[0]+line.lx()*2/3 , line.start[1]+line.ly()*2/3]  ))
+    kblock.append( [line.start[0]+line.lx()*2/3 , line.start[1]+line.ly()*2/3] )
 
     #Fourth piece _
-    kblock.append(Line(  [kblock[2].end[0] , kblock[2].end[1]]  ,  [line.end[0] , line.end[1]]  ))
+    kblock.append( [line.end[0] , line.end[1]] )
 
     return kblock
 
 
 class Koch:
     def __init__(self):
-        self.k = 0;
-        self.structure = []
-        self.structure.append(Line([-1,0],[1,0]))
+        self.structure = PLine()
+        self.structure.add([-1,0])
+        self.structure.add([1,0])
 
     def update(self):
         """
         This function iterate over all the elements and apply the gamma function in each line
         """
-        for i,item in enumerate(self.structure):
-            self.structure[i] = gamma(item)
+
+        for i in range(len(self.structure.points)):
+            if(i == 0):
+                start = self.structure.points[i]
+            else:
+                print(i)
+                print(self.structure.points)
+                new  =  gamma(Line(start,self.structure.points[i]))
+                self.structure.points.insert(i,new[1])
+                self.structure.points.insert(i,new[2])
+                self.structure.points.insert(i,new[3])
+                start = self.structure.points[i]
+                i = i+3
+                print(self.structure.points)
+
+
+
 
         #Flat the list from [[],[],[]] to [,,]
-        self.structure = [val for sublist in self.structure for val in sublist]
+        #self.structure = [val for sublist in self.structure for val in sublist]
 
 
 
@@ -147,12 +175,12 @@ scene = Scene('test')
 a = Koch()
 
 #Number of updates
-n = 3
+n = 4
 
 for i in range(0,n):
     a.update()
 
 
-scene.add_figure(a)
+scene.add_pline(a)
 scene.write_svg()
 scene.display()
