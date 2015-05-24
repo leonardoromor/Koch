@@ -52,16 +52,20 @@ class Scene:
         return
 
 
+def change_viewport(point,x1,x2,y1,y2,width,height):
+    point[0] = (point[0]-x1)*(width)/(x2-x1)
+    point[1] = (point[1]-y2)*(height)/(y1-y2)
+
+
 
 def remap_figure(figure):
     for p in figure.points:
-        cart_mapper(p,1024,768)
+        change_viewport(p,-2,2,-2,2,1024,768)
 
 def cart_mapper(point, width, height, ptrasl = [0,0]):
 
     point[0] = width/2 + point[0] * width/2 +  ptrasl[0]
     point[1] = height/2 - point[1] * height/2 + ptrasl[1]
-
 
 
 class PLine:
@@ -203,8 +207,23 @@ class function:
 
         return [s*2-1,self.f(2*np.pi*s)]
 
+    def to_PLine(self, points):
+        poly = PLine()
+
+        for i in np.linspace(0, 1, num=points):
+            poly.add(self.s_to_point(i))
+        return poly
 
 
+class Composition:
+
+    def __init__(self,koch , func, refinement=10000):
+        self.structure = PLine()
+        for i in np.linspace(0, 1, num=1000):
+            newp = p_sum(koch.s_to_point(i),func.s_to_point(i))
+            newp[0] = newp[0]
+            newp[1] = newp[1]
+            self.structure.add(newp)
 
 #Init scene
 scene = Scene('test')
@@ -220,18 +239,15 @@ for i in range(0,n):
 
 #Composition with a function
 f = function(np.sin)
-composition = PLine()
+func = f.to_PLine(10000)
+comp = Composition(a,f)
 
-refinement = 1000
-for i in np.linspace(0, 1, num=1000):
-    newp = p_sum(a.s_to_point(i),f.s_to_point(i))
-    newp[0] = newp[0]/2
-    newp[1] = newp[1]/2
-    composition.add(newp)
-
-remap_figure(composition)
+remap_figure(func)
+remap_figure(comp.structure)
 remap_figure(a.structure)
 scene.add_pline(a.structure)
-scene.add_pline(composition)
+
+scene.add_pline(func)
+scene.add_pline(comp.structure)
 scene.write_svg()
 scene.display()
