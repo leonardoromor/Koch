@@ -282,7 +282,7 @@ scene0.add_pline(func0)
 scene0.add_pline(atemp.structure)
 
 scene0.write_svg()
-scene0.display()
+#scene0.display()
 
 ################################################################################
 #quadrato
