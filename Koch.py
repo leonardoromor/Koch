@@ -246,6 +246,9 @@ def retta10(s):
 def seno(s):
     return [s,np.sin(2*np.pi*s)]
 
+def test1(s):
+    return [s,5*np.sqrt(s)]
+
 #Init Koch
 a = Koch()
 #Number of updates
@@ -397,3 +400,32 @@ scene4.add_pline(atemp.structure)
 
 scene4.write_svg()
 #scene4.display()
+
+################################################################################
+#test1
+################################################################################
+w=600
+h=800
+scene5 = Scene('Test1',h,w)
+f5 = function(test1)
+atemp = copy.deepcopy(a)
+func5 = f5.to_PLine(10000)
+comp = Composition(atemp,f5)
+
+x1=0
+x2=2.5
+y1=0
+y2=5
+
+remap_figure(func5,x1,x2,y1,y2,w,h)
+remap_figure(comp.structure,x1,x2,y1,y2,w,h)
+remap_figure(atemp.structure,x1,x2,y1,y2,w,h)
+
+
+scene5.add_pline(comp.structure)
+scene5.write_svg(filename="Test1_unica.svg")
+scene5.add_pline(func5)
+scene5.add_pline(atemp.structure)
+
+scene5.write_svg()
+scene5.display()
