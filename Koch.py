@@ -88,7 +88,7 @@ class PLine:
         for p in self.points:
             svgp += "   " + str(p[0]) + "," + str(p[1]) + "\n"
 
-        svgp += "   \" style=\"fill:none;stroke:black;stroke-width:0.1\" />"
+        svgp += "   \" style=\"fill:none;stroke:black;stroke-width:1\" />"
 
         return svgp
 
@@ -197,6 +197,19 @@ class Koch:
 def p_sum(p1,p2):
     return [p1[0]+p2[0],p1[1]+p2[1]]
 
+"""
+def quadrato(s):
+return [2s-1,s^2]
+def radice(s):
+return [2s-1,sqrt(s)]
+def retta5(s):
+return [2s-1,5*s]
+def retta10(s):
+return [2s-1,10*s]
+"""
+def retta10(s):
+    return [s,10*s]
+
 class function:
 
     def __init__(self,func):
@@ -205,7 +218,7 @@ class function:
 
     def s_to_point(self,s):
 
-        return [s,self.f(2*np.pi*s)]
+        return self.f(s)
 
     def to_PLine(self, points):
         poly = PLine()
@@ -219,7 +232,7 @@ class Composition:
 
     def __init__(self,koch , func, refinement=10000):
         self.structure = PLine()
-        for i in np.linspace(0, 1, num=1000):
+        for i in np.linspace(0, 1, num=refinement):
             newp = p_sum(koch.s_to_point(i),func.s_to_point(i))
             newp[0] = newp[0]
             newp[1] = newp[1]
@@ -238,7 +251,7 @@ for i in range(0,n):
     a.update()
 
 #Composition with a function
-f = function(np.sin)
+f = function(retta10)
 func = f.to_PLine(10000)
 comp = Composition(a,f)
 
