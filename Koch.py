@@ -6,6 +6,7 @@ Requires numpy package and imagemagick
 
 import numpy as np
 import os
+import copy
 
 display_prog = 'display'
 
@@ -58,15 +59,17 @@ def change_viewport(point,x1,x2,y1,y2,width,height):
 
 
 
-def remap_figure(figure):
+def remap_figure(figure,x1,x2,y1,y2,width,height):
     for p in figure.points:
-        change_viewport(p,-2,10,-1,10,1024,768)
+        change_viewport(p,x1,x2,y1,y2,width,height)
 
 def cart_mapper(point, width, height, ptrasl = [0,0]):
 
     point[0] = width/2 + point[0] * width/2 +  ptrasl[0]
     point[1] = height/2 - point[1] * height/2 + ptrasl[1]
 
+def p_sum(p1,p2):
+    return [p1[0]+p2[0],p1[1]+p2[1]]
 
 class PLine:
     """
@@ -194,21 +197,8 @@ class Koch:
         return a
 
 
-def p_sum(p1,p2):
-    return [p1[0]+p2[0],p1[1]+p2[1]]
 
-"""
-def quadrato(s):
-return [2s-1,s^2]
-def radice(s):
-return [2s-1,sqrt(s)]
-def retta5(s):
-return [2s-1,5*s]
-def retta10(s):
-return [2s-1,10*s]
-"""
-def retta10(s):
-    return [s,10*s]
+
 
 class function:
 
@@ -230,7 +220,7 @@ class function:
 
 class Composition:
 
-    def __init__(self,koch , func, refinement=100000):
+    def __init__(self,koch , func, refinement=10000):
         self.structure = PLine()
         for i in np.linspace(0, 1, num=refinement):
             newp = p_sum(koch.s_to_point(i),func.s_to_point(i))
@@ -238,29 +228,172 @@ class Composition:
             newp[1] = newp[1]
             self.structure.add(newp)
 
-#Init scene
-scene = Scene('test')
+
+
+
+def quadrato(s):
+    return [s,s*s]
+
+def radice(s):
+    return [s,np.sqrt(s)]
+
+def retta5(s):
+    return [s,5*s]
+
+def retta10(s):
+    return [s,10*s]
+
+def seno(s):
+    return [s,np.sin(2*np.pi*s)]
 
 #Init Koch
 a = Koch()
-
 #Number of updates
 n = 6
 
 for i in range(0,n):
     a.update()
 
-#Composition with a function
-f = function(retta10)
-func = f.to_PLine(10000)
-comp = Composition(a,f)
 
-remap_figure(func)
-remap_figure(comp.structure)
-remap_figure(a.structure)
-scene.add_pline(a.structure)
+################################################################################
+#seno
+################################################################################
+w=900
+h=768
+scene0 = Scene('Seno',h,w)
+f0 = function(seno)
+atemp = copy.deepcopy(a)
+func0 = f0.to_PLine(10000)
+comp = Composition(atemp,f0)
 
-scene.add_pline(func)
-scene.add_pline(comp.structure)
-scene.write_svg()
-scene.display()
+x1=0
+x2=2
+y1=-1.5
+y2=1.5
+
+remap_figure(func0,x1,x2,y1,y2,w,h)
+remap_figure(comp.structure,x1,x2,y1,y2,w,h)
+remap_figure(atemp.structure,x1,x2,y1,y2,w,h)
+
+
+scene0.add_pline(comp.structure)
+scene0.write_svg(filename="Seno_unica.svg")
+scene0.add_pline(func0)
+scene0.add_pline(atemp.structure)
+
+scene0.write_svg()
+scene0.display()
+
+################################################################################
+#quadrato
+################################################################################
+w=1000
+h=500
+scene1 = Scene('Quadrato',h,w)
+f1 = function(quadrato)
+atemp = copy.deepcopy(a)
+func1 = f1.to_PLine(10000)
+comp = Composition(atemp,f1)
+
+x1=0
+x2=2
+y1=0
+y2=1
+
+remap_figure(func1,x1,x2,y1,y2,w,h)
+remap_figure(comp.structure,x1,x2,y1,y2,w,h)
+remap_figure(atemp.structure,x1,x2,y1,y2,w,h)
+
+
+scene1.add_pline(comp.structure)
+scene1.write_svg(filename="Quadrato_unica.svg")
+scene1.add_pline(func1)
+scene1.add_pline(atemp.structure)
+
+scene1.write_svg()
+#scene1.display()
+
+################################################################################
+#radice
+################################################################################
+w=1000
+h=750
+scene2 = Scene('Radice',h,w)
+f2 = function(radice)
+atemp = copy.deepcopy(a)
+func2 = f2.to_PLine(10000)
+comp = Composition(atemp,f2)
+
+x1=0
+x2=2
+y1=0
+y2=1.5
+
+remap_figure(func2,x1,x2,y1,y2,w,h)
+remap_figure(comp.structure,x1,x2,y1,y2,w,h)
+remap_figure(atemp.structure,x1,x2,y1,y2,w,h)
+
+
+scene2.add_pline(comp.structure)
+scene2.write_svg(filename="Radice_unica.svg")
+scene2.add_pline(func2)
+scene2.add_pline(atemp.structure)
+
+scene2.write_svg()
+#scene2.display()
+################################################################################
+#retta5
+################################################################################
+w=600
+h=800
+scene3 = Scene('Retta5',h,w)
+f3 = function(retta5)
+atemp = copy.deepcopy(a)
+func3 = f3.to_PLine(10000)
+comp = Composition(atemp,f3)
+
+x1=0
+x2=3
+y1=0
+y2=5
+
+remap_figure(func3,x1,x2,y1,y2,w,h)
+remap_figure(comp.structure,x1,x2,y1,y2,w,h)
+remap_figure(atemp.structure,x1,x2,y1,y2,w,h)
+
+
+scene3.add_pline(comp.structure)
+scene3.write_svg(filename="Retta5_unica.svg")
+scene3.add_pline(func3)
+scene3.add_pline(atemp.structure)
+
+scene3.write_svg()
+#scene3.display()
+################################################################################
+#retta10
+################################################################################
+w=600
+h=800
+scene4 = Scene('Retta10',h,w)
+f4 = function(retta10)
+atemp = copy.deepcopy(a)
+func4 = f4.to_PLine(10000)
+comp = Composition(atemp,f4)
+
+x1=0
+x2=5
+y1=0
+y2=10
+
+remap_figure(func4,x1,x2,y1,y2,w,h)
+remap_figure(comp.structure,x1,x2,y1,y2,w,h)
+remap_figure(atemp.structure,x1,x2,y1,y2,w,h)
+
+
+scene4.add_pline(comp.structure)
+scene4.write_svg(filename="Retta10_unica.svg")
+scene4.add_pline(func4)
+scene4.add_pline(atemp.structure)
+
+scene4.write_svg()
+#scene4.display()
