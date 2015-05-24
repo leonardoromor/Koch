@@ -88,7 +88,7 @@ class PLine:
         for p in self.points:
             svgp += "   " + str(p[0]) + "," + str(p[1]) + "\n"
 
-        svgp += "   \" style=\"fill:none;stroke:black;stroke-width:1\" />"
+        svgp += "   \" style=\"fill:none;stroke:black;stroke-width:0.2\" />"
 
         return svgp
 
@@ -230,7 +230,7 @@ class function:
 
 class Composition:
 
-    def __init__(self,koch , func, refinement=10000):
+    def __init__(self,koch , func, refinement=100000):
         self.structure = PLine()
         for i in np.linspace(0, 1, num=refinement):
             newp = p_sum(koch.s_to_point(i),func.s_to_point(i))
@@ -245,7 +245,7 @@ scene = Scene('test')
 a = Koch()
 
 #Number of updates
-n = 5
+n = 6
 
 for i in range(0,n):
     a.update()
