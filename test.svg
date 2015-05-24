@@ -1027,7 +1027,7 @@
    766.419753086,383.315733014
    766.9465020576132,384.0
    768.0,384.0
-   " style="fill:none;stroke:black;stroke-width:1" /><polyline points="   512.0,384.0
+   " style="fill:none;stroke:black;stroke-width:0.1" /><polyline points="   512.0,384.0
    512.02560256,383.879350785
    512.051205121,383.758701618
    512.076807681,383.638052546
@@ -11027,7 +11027,7 @@
    767.948794879,384.241298382
    767.97439744,384.120649215
    768.0,384.0
-   " style="fill:none;stroke:black;stroke-width:1" /><polyline points="   512.0,384.0
+   " style="fill:none;stroke:black;stroke-width:0.1" /><polyline points="   512.0,384.0
    513.312882327,382.788365246
    514.099015682,380.908765505
    514.894533422,380.377477481
@@ -12027,5 +12027,5 @@
    1021.49923535,386.260841977
    1022.2853687,384.681620417
    1024.0,384.0
-   " style="fill:none;stroke:black;stroke-width:1" /> </g>
+   " style="fill:none;stroke:black;stroke-width:0.1" /> </g>
 </svg>

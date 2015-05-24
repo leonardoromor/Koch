@@ -88,7 +88,7 @@ class PLine:
         for p in self.points:
             svgp += "   " + str(p[0]) + "," + str(p[1]) + "\n"
 
-        svgp += "   \" style=\"fill:none;stroke:black;stroke-width:1\" />"
+        svgp += "   \" style=\"fill:none;stroke:black;stroke-width:0.1\" />"
 
         return svgp
 
