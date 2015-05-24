@@ -60,7 +60,7 @@ def change_viewport(point,x1,x2,y1,y2,width,height):
 
 def remap_figure(figure):
     for p in figure.points:
-        change_viewport(p,-2,2,-2,2,1024,768)
+        change_viewport(p,-2,10,-1,10,1024,768)
 
 def cart_mapper(point, width, height, ptrasl = [0,0]):
 
