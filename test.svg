@@ -1027,7 +1027,7 @@
    1017.67901235,381.262932057
    1019.7860082304527,384.0
    1024.0,384.0
-   " style="fill:none;stroke:black;stroke-width:20%" /><polyline points="   0.0,384.0
+   " style="fill:none;stroke:black;stroke-width:0.1" /><polyline points="   0.0,384.0
    2.62263652541,382.788365246
    4.19177510844,380.224498519
    5.77029807585,380.377477481
@@ -2027,5 +2027,5 @@
    1018.87972695,386.260841977
    1020.44886553,383.997353431
    1024.0,384.0
-   " style="fill:none;stroke:black;stroke-width:20%" /> </g>
+   " style="fill:none;stroke:black;stroke-width:0.1" /> </g>
 </svg>
