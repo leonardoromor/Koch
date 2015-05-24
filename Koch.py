@@ -26,11 +26,7 @@ class Scene:
     def add(self,item): self.items.append(item)
 
     def add_pline(self, figure):
-
-        for p in figure.structure.points:
-            self.cart_mapper(p)
-
-        self.items.append(figure.structure)
+        self.items.append(figure)
 
     def strarray(self):
         var = ["<?xml version=\"1.0\"?>\n",
@@ -55,9 +51,16 @@ class Scene:
         os.system("%s %s" % (prog,self.svgname))
         return
 
-    def cart_mapper(self,point):
-        point[0] = self.width/2 + point[0]*self.width/2
-        point[1] = self.height/2 - point[1] * self.height/2
+
+
+def remap_figure(figure):
+    for p in figure.points:
+        cart_mapper(p,1024,768)
+
+def cart_mapper(point, width, height, ptrasl = [0,0]):
+
+    point[0] = width/2 + point[0] * width/2 +  ptrasl[0]
+    point[1] = height/2 - point[1] * height/2 + ptrasl[1]
 
 
 
@@ -72,13 +75,16 @@ class PLine:
     def add(self, p):
         self.points.append(p)
 
+    def length(self):
+        return len(self.points)
+
     def strarray(self):
-        svgp = "  <polyline points=\""
+        svgp = "<polyline points=\""
 
         for p in self.points:
             svgp += "   " + str(p[0]) + "," + str(p[1]) + "\n"
 
-        svgp += "   \" style=\"fill:none;stroke:black;stroke-width:3\" />"
+        svgp += "   \" style=\"fill:none;stroke:black;stroke-width:20%\" />"
 
         return svgp
 
@@ -143,27 +149,59 @@ class Koch:
         """
         This function iterate over all the elements and apply the gamma function in each line
         """
+        i = 0
 
-        for i in range(len(self.structure.points)):
+        while i < len(self.structure.points):
             if(i == 0):
                 start = self.structure.points[i]
+                i += 1
             else:
-                print(i)
-                print(self.structure.points)
+
                 new  =  gamma(Line(start,self.structure.points[i]))
+
                 self.structure.points.insert(i,new[1])
-                self.structure.points.insert(i,new[2])
-                self.structure.points.insert(i,new[3])
-                start = self.structure.points[i]
-                i = i+3
-                print(self.structure.points)
-
-
-
+                self.structure.points.insert(i+1,new[2])
+                self.structure.points.insert(i+2,new[3])
+                start = self.structure.points[i+3]
+                i = i+4
 
         #Flat the list from [[],[],[]] to [,,]
         #self.structure = [val for sublist in self.structure for val in sublist]
 
+    def s_to_point(self,s):
+
+        N = self.structure.length() - 1
+        sstep = 1.0/N
+
+        stimes = s / sstep
+        stimes = int(stimes)
+        slength = s - (sstep * stimes)
+        ratio = 0
+        a =  self.structure.points[stimes]
+        if(np.fabs(slength) > 1e-10):
+            b = self.structure.points[stimes+1]
+
+            line = Line(a,b)
+
+            ratio = slength /  line.length()
+
+            return p_sum(a,[line.lx()*ratio,line.ly()*ratio])
+
+        return a
+
+
+def p_sum(p1,p2):
+    return [p1[0]+p2[0],p1[1]+p2[1]]
+
+class function:
+
+    def __init__(self,func):
+        self.f = func
+
+
+    def s_to_point(self,s):
+
+        return [s*2-1,self.f(2*np.pi*s)]
 
 
 
@@ -175,12 +213,25 @@ scene = Scene('test')
 a = Koch()
 
 #Number of updates
-n = 4
+n = 5
 
 for i in range(0,n):
     a.update()
 
+#Composition with a function
+f = function(np.sin)
+composition = PLine()
 
-scene.add_pline(a)
+refinement = 1000
+for i in np.linspace(0, 1, num=1000):
+    newp = p_sum(a.s_to_point(i),f.s_to_point(i))
+    newp[0] = newp[0]/2
+    newp[1] = newp[1]/2
+    composition.add(newp)
+
+remap_figure(composition)
+remap_figure(a.structure)
+scene.add_pline(a.structure)
+scene.add_pline(composition)
 scene.write_svg()
 scene.display()
