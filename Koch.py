@@ -146,7 +146,7 @@ def gamma(line):
 class Koch:
     def __init__(self):
         self.structure = PLine()
-        self.structure.add([-1,0])
+        self.structure.add([0,0])
         self.structure.add([1,0])
 
     def update(self):
@@ -205,7 +205,7 @@ class function:
 
     def s_to_point(self,s):
 
-        return [s*2-1,self.f(2*np.pi*s)]
+        return [s,self.f(2*np.pi*s)]
 
     def to_PLine(self, points):
         poly = PLine()
